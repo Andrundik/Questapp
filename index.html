@@ -3,189 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quest Board</title>
+    <title>Quest Board Mini App</title>
+    <!-- Официальный скрипт Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
-            font-family: sans-serif;
             margin: 0;
-            padding: 15px 15px 80px 15px;
-            max-width: 480px;
-            margin-left: auto;
-            margin-right: auto;
-            box-sizing: border-box;
+            padding: 16px;
         }
-
-        h1 {
-            text-align: center;
-            font-size: 22px;
-            margin-bottom: 15px;
-        }
-
-        .tickets-card {
-            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            padding: 12px;
-            border-radius: 16px;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .wheel-container {
-            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            height: 140px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .section-title {
-            font-size: 15px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-align: left;
-        }
-
-        .quests-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .quest-item {
-            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            padding: 10px 12px;
-            border-radius: 14px;
+        h1 { font-size: 22px; text-align: center; margin-bottom: 20px; }
+        .quest-card {
+            background: var(--tg-theme-secondary-bg-color, #f1f1f1);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
         }
-
-        .quest-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-grow: 1;
-            overflow: hidden;
-        }
-
-        .quest-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background-color: #ccc;
-            object-fit: cover;
-            flex-shrink: 0;
-        }
-
-        .quest-title {
-            font-size: 13px;
-            font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Кнопка квеста, которая меняет состояние */
-        .quest-btn {
-            background-color: var(--tg-theme-button-color, #ff6600);
+        .quest-info { display: flex; align-items: center; gap: 12px; }
+        .quest-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: #ccc; }
+        .quest-title { font-weight: 600; font-size: 16px; }
+        .quest-reward { font-size: 13px; color: var(--tg-theme-hint-color, #777); margin-top: 4px; }
+        .btn {
+            background-color: var(--tg-theme-button-color, #2481cc);
             color: var(--tg-theme-button-text-color, #ffffff);
-            padding: 6px 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: bold;
             border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-weight: 600;
             cursor: pointer;
-            white-space: nowrap;
         }
-
-        .quest-btn.checked {
-            background-color: #4caf50;
+        .form-container {
+            margin-top: 30px;
+            background: var(--tg-theme-secondary-bg-color, #f1f1f1);
+            padding: 16px;
+            border-radius: 12px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
         }
     </style>
 </head>
 <body>
 
-    <h1>Quest Board</h1>
+    <h1>📋 Доска Квестов</h1>
 
-    <div class="tickets-card">
-        🎟 Билетов: <span id="tickets-count">0</span>
+    <!-- Список квестов -->
+    <div id="quests-list">
+        <!-- Сюда динамически добавляются квесты -->
     </div>
 
-    <div class="wheel-container">
-        🎡 Колесо фортуны
-    </div>
-
-    <div class="section-title">📌 Подписаться на каналы</div>
-    <div class="quests-container">
-        <div class="quest-item" id="quest-1">
-            <div class="quest-info">
-                <img src="https://via.placeholder.com/40" alt="avatar" class="quest-avatar">
-                <div class="quest-title">Канал Крипто Новости</div>
-            </div>
-            <button class="quest-btn" id="btn-1" onclick="handleQuestClick('https://t.me/durov', 'btn-1')">Выполнить</button>
-        </div>
+    <!-- Форма создания квеста прямо в Mini App -->
+    <div class="form-container">
+        <h3>Создать новый квест</h3>
+        <input type="text" id="inputName" placeholder="Название квеста (оставьте пустым для авто-подтяжки)">
+        <input type="text" id="inputChannel" placeholder="Юзернейм канала (например: @durov)">
+        <input type="text" id="inputReward" placeholder="Награда (например: 50 XP)">
+        <button class="btn" onclick="addNewQuest()" style="width: 100%;">Добавить квест</button>
     </div>
 
     <script>
+        // Инициализация Telegram Web App
         let tg = window.Telegram.WebApp;
-        tg.ready();
+        tg.expand();
 
-        // Состояние квеста для каждого блока: 'subscribe' -> 'check' -> 'done'
-        let questState = 'subscribe'; 
+        // Базовый массив квестов (хранится в памяти браузера)
+        let quests = JSON.parse(localStorage.getItem('my_quests')) || [];
 
-        function handleQuestClick(channelUrl, btnId) {
-            let btn = document.getElementById(btnId);
+        function renderQuests() {
+            const listEl = document.getElementById('quests-list');
+            listEl.innerHTML = '';
 
-            if (questState === 'subscribe') {
-                // 1. Шаг: Пользователь кликает "Выполнить" -> открывается канал, окно сворачивается/не закрывается
-                tg.openTelegramLink(channelUrl);
-                
-                // Меняем кнопку на "Проверить"
-                questState = 'check';
-                btn.innerText = "Проверить";
-                btn.style.backgroundColor = "#2196F3"; // Синий цвет для проверки
-                
-            } else if (questState === 'check') {
-                // 2. Шаг: Пользователь вернулся и нажал "Проверить" -> делаем запрос к боту
-                btn.innerText = "Проверка...";
-                
-                fetch('/check_sub', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: tg.initDataUnsafe.user.id })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Успех! Подписка подтверждена
-                        questState = 'done';
-                        btn.innerText = "Готово ✔";
-                        btn.classList.add('checked');
-                        btn.disabled = true;
-                        
-                        // Обновляем баланс на экране
-                        document.getElementById('tickets-count').innerText = data.tickets;
-                        tg.showAlert("🎉 Поздравляем! Вам начислен 1 билет.");
-                    } else {
-                        // Если еще не подписался
-                        btn.innerText = "Проверить";
-                        tg.showAlert("❌ Вы еще не подписались на канал!");
-                    }
-                })
-                .catch(error => {
-                    btn.innerText = "Проверить";
-                    tg.showAlert("⚠️ Ошибка соединения с сервером.");
-                });
+            if (quests.length === 0) {
+                listEl.innerHTML = '<p style="text-align: center; color: gray;">Пока нет активных квестов.</p>';
+                return;
             }
+
+            quests.forEach((quest, index) => {
+                listEl.innerHTML += `
+                    <div class="quest-card">
+                        <div class="quest-info">
+                            <img src="${quest.avatar}" class="quest-avatar" alt="icon">
+                            <div>
+                                <div class="quest-title">${quest.title}</div>
+                                <div class="quest-reward">Награда: ${quest.reward}</div>
+                            </div>
+                        </div>
+                        <button class="btn" onclick="completeQuest(${index})">Выполнить</button>
+                    </div>
+                `;
+            });
         }
+
+        async function addNewQuest() {
+            let customName = document.getElementById('inputName').value.trim();
+            let channel = document.getElementById('inputChannel').value.trim();
+            let reward = document.getElementById('inputReward').value.trim() || '10 XP';
+
+            if (!channel) {
+                alert('Укажите юзернейм канала!');
+                return;
+            }
+
+            // Очищаем юзернейм от символа @ для запросов
+            let cleanChannel = channel.replace('@', '');
+            
+            // Автоматическое подтягивание данных из публичного источника Telegram (превью канала)
+            let title = customName !== "" ? customName : `Подписка на @${cleanChannel}`;
+            // Стандартная публичная ссылка на аватарку Telegram-канала по юзернейму
+            let avatar = `https://t.me/i/userpic/300/${cleanChannel}.jpg`;
+
+            quests.push({
+                title: title,
+                avatar: avatar,
+                reward: reward
+            });
+
+            localStorage.setItem('my_quests', JSON.stringify(quests));
+            
+            // Очистка полей ввода
+            document.getElementById('inputName').value = '';
+            document.getElementById('inputChannel').value = '';
+            document.getElementById('inputReward').value = '';
+
+            renderQuests();
+        }
+
+        function completeQuest(index) {
+            alert('Квест выполнен!');
+            quests.splice(index, 1);
+            localStorage.setItem('my_quests', JSON.stringify(quests));
+            renderQuests();
+        }
+
+        // Первичная отрисовка при загрузке
+        renderQuests();
     </script>
 </body>
 </html>
