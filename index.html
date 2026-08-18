@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quest Board Mini App</title>
-    <!-- Официальный скрипт Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -37,20 +36,6 @@
             font-weight: 600;
             cursor: pointer;
         }
-        .form-container {
-            margin-top: 30px;
-            background: var(--tg-theme-secondary-bg-color, #f1f1f1);
-            padding: 16px;
-            border-radius: 12px;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
     </style>
 </head>
 <body>
@@ -59,25 +44,23 @@
 
     <!-- Список квестов -->
     <div id="quests-list">
-        <!-- Сюда динамически добавляются квесты -->
-    </div>
-
-    <!-- Форма создания квеста прямо в Mini App -->
-    <div class="form-container">
-        <h3>Создать новый квест</h3>
-        <input type="text" id="inputName" placeholder="Название квеста (оставьте пустым для авто-подтяжки)">
-        <input type="text" id="inputChannel" placeholder="Юзернейм канала (например: @durov)">
-        <input type="text" id="inputReward" placeholder="Награда (например: 50 XP)">
-        <button class="btn" onclick="addNewQuest()" style="width: 100%;">Добавить квест</button>
+        <!-- Квесты будут подгружаться сюда -->
     </div>
 
     <script>
-        // Инициализация Telegram Web App
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Базовый массив квестов (хранится в памяти браузера)
-        let quests = JSON.parse(localStorage.getItem('my_quests')) || [];
+        // Пример дефолтных квестов на случай первого запуска (админ может добавлять новые через бота)
+        let defaultQuests = [
+            {
+                title: "Подписка на канал",
+                avatar: "https://t.me/i/userpic/300/durov.jpg",
+                reward: "50 XP"
+            }
+        ];
+
+        let quests = JSON.parse(localStorage.getItem('my_quests')) || defaultQuests;
 
         function renderQuests() {
             const listEl = document.getElementById('quests-list');
@@ -92,7 +75,7 @@
                 listEl.innerHTML += `
                     <div class="quest-card">
                         <div class="quest-info">
-                            <img src="${quest.avatar}" class="quest-avatar" alt="icon">
+                            <img src="${quest.avatar}" class="quest-avatar" alt="icon" onerror="this.src='https://t.me/i/userpic/300/durov.jpg'">
                             <div>
                                 <div class="quest-title">${quest.title}</div>
                                 <div class="quest-reward">Награда: ${quest.reward}</div>
@@ -104,40 +87,6 @@
             });
         }
 
-        async function addNewQuest() {
-            let customName = document.getElementById('inputName').value.trim();
-            let channel = document.getElementById('inputChannel').value.trim();
-            let reward = document.getElementById('inputReward').value.trim() || '10 XP';
-
-            if (!channel) {
-                alert('Укажите юзернейм канала!');
-                return;
-            }
-
-            // Очищаем юзернейм от символа @ для запросов
-            let cleanChannel = channel.replace('@', '');
-            
-            // Автоматическое подтягивание данных из публичного источника Telegram (превью канала)
-            let title = customName !== "" ? customName : `Подписка на @${cleanChannel}`;
-            // Стандартная публичная ссылка на аватарку Telegram-канала по юзернейму
-            let avatar = `https://t.me/i/userpic/300/${cleanChannel}.jpg`;
-
-            quests.push({
-                title: title,
-                avatar: avatar,
-                reward: reward
-            });
-
-            localStorage.setItem('my_quests', JSON.stringify(quests));
-            
-            // Очистка полей ввода
-            document.getElementById('inputName').value = '';
-            document.getElementById('inputChannel').value = '';
-            document.getElementById('inputReward').value = '';
-
-            renderQuests();
-        }
-
         function completeQuest(index) {
             alert('Квест выполнен!');
             quests.splice(index, 1);
@@ -145,7 +94,6 @@
             renderQuests();
         }
 
-        // Первичная отрисовка при загрузке
         renderQuests();
     </script>
 </body>
